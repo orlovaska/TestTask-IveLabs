@@ -1,6 +1,7 @@
 import React from "react";
 import { GRAPH_ROUTE } from "../../routing/routesConsts";
 import Navbar from "../Navbar";
+import PointHighChart from "../Graph/PointHighcharts";
 
 const GraphPage: React.FC = () => {
     return (
@@ -11,7 +12,7 @@ const GraphPage: React.FC = () => {
             }}
         >
             <Navbar activeKey={GRAPH_ROUTE} />
-            GraphPage
+            <PointHighChart />
         </div>
     );
 };
