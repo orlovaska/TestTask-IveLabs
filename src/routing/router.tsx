@@ -6,7 +6,7 @@ import { BRIGADES_ROUTE, GRAPH_ROUTE } from "./routesConsts";
 export const router = createBrowserRouter([
     {
         path: "/",
-        element: <Navigate to={GRAPH_ROUTE} replace />,
+        element: <Navigate to={BRIGADES_ROUTE} replace />,
     },
     {
         path: BRIGADES_ROUTE,

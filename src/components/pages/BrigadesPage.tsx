@@ -1,6 +1,7 @@
 import React from "react";
 import { BRIGADES_ROUTE } from "../../routing/routesConsts";
 import Navbar from "../Navbar";
+import BrigadesList from "../Brigades/BragadesList";
 
 const BrigadesPage: React.FC = () => {
     return (
@@ -11,7 +12,7 @@ const BrigadesPage: React.FC = () => {
             }}
         >
             <Navbar activeKey={BRIGADES_ROUTE} />
-            BrigadesPage
+            <BrigadesList/>
         </div>
     );
 };
