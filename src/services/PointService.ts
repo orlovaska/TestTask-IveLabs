@@ -8,12 +8,6 @@ export default class ClassService {
         const result = axios.get<any>(
             `${API_URL}/${getBrigadesData_ROUTE}?points=${countOfPoints}`
         );
-        const response = await result;
-
-        if (response) {
-            console.log("getClassesByOntologyId response: ", response);
-            console.log("data: ", response?.data);
-        }
         return result;
     }
 }

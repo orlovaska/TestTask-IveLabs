@@ -2,11 +2,16 @@ import React, { useEffect, useState } from "react";
 import { AutoSizer, List, ListRowProps } from "react-virtualized";
 import "react-virtualized/styles.css"; // импортируем стили
 import BrigadeCard from "./BrigadeCard";
-import BrigadesFilters from "./BrigadesFilters";
-import { Department } from "../../models/Department";
-import { ConnectionState } from "../../models/ConnectionState";
+import BrigadesFilters, { Filter } from "./BrigadesFilters";
 import { Brigade } from "../../models/Brigade";
-import BrigadeService from "../../services/BrigadeService";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import {
+    fetchBrigades,
+    fetchConnectionStates,
+    fetchDepartments,
+} from "../../store/reducers/BrigadesSlice";
+import { Modal, Spin, Typography } from "antd";
+const { Paragraph } = Typography;
 
 interface Size {
     width: number;
@@ -16,67 +21,74 @@ interface Size {
 const cardWidth = 300;
 
 const BrigadesList: React.FC = () => {
-    const departments: Department[] = [
-        {
-            id: 0,
-            name: "Лукойл",
-        },
-        {
-            id: 1,
-            name: "Роснефть",
-        },
-        {
-            id: 2,
-            name: "Газпром нефть",
-        },
-    ];
-    const connectionStates: ConnectionState[] = [
-        {
-            id: 0,
-            name: "Недоступен",
-        },
-        {
-            id: 1,
-            name: "Доступен",
-        },
-    ];
-    useEffect(() => {
-        const fetchClasses = async () => {
-            try {
-                BrigadeService.getConnectionState().then((response) => {});
-                BrigadeService.getDepartments().then((response) => {});
-                BrigadeService.getBrigadesData().then((response) => {});
-            } catch (error) {
-                //TODO - сделать обработку ошибок
-                console.error("Ошибка при получении данных:", error);
-            }
-        };
+    const dispatch = useAppDispatch();
+    const { brigades, isLoading, error } = useAppSelector(
+        (state) => state.brigadesReducer
+    );
+    const departments = useAppSelector(
+        (state) => state.brigadesReducer.departments
+    );
+    const connectionStates = useAppSelector(
+        (state) => state.brigadesReducer.connectionStates
+    );
 
-        fetchClasses();
+    const [filteredBrigades, setFilteredBrigades] = useState<Brigade[]>(
+        brigades ? brigades : []
+    );
+
+    useEffect(() => {
+        setFilteredBrigades(brigades ?? []);
+    }, [brigades?.length]);
+
+    useEffect(() => {
+        if (brigades == null) {
+            dispatch(fetchBrigades());
+        }
+        if (departments == null) {
+            dispatch(fetchDepartments());
+        }
+        if (connectionStates == null) {
+            dispatch(fetchConnectionStates());
+        }
     }, []);
 
-    const [brigades, setBrigades] = useState<Brigade[]>();
-    const [filteredBrigades, setFilteredBrigades] = useState(brigades);
+    useEffect(() => {
+        if (error) {
+            Modal.error({
+                title: "Ошибка при получении данных",
+                content: error,
+            });
+        }
+    }, [error]);
 
-    const onSelectedConnectionChange = (
-        selectedValues: number[] | undefined
-    ): void => {
-        const newFilteredBrigades = brigades?.filter((brigade) =>
-            selectedValues
-                ? selectedValues.includes(brigade.connectionState.id)
-                : true
-        );
-        setFilteredBrigades(newFilteredBrigades);
-    };
+    const handleFiltersChange = (filters: Filter[]): void => {
+        if (!brigades) return;
 
-    const onSelectedDepartmentChange = (
-        selectedValues: number[] | undefined
-    ): void => {
-        const newFilteredBrigades = brigades?.filter((brigade) =>
-            selectedValues
-                ? selectedValues.includes(brigade.department.id)
-                : true
-        );
+        const newFilteredBrigades = brigades.filter((brigade) => {
+            return filters.every((filter) => {
+                if (
+                    !filter.selectedValues ||
+                    filter.selectedValues.length === 0
+                ) {
+                    // Если фильтр не активен, то считаем условие выполненным
+                    return true;
+                }
+
+                switch (filter.filteringFields) {
+                    case "department":
+                        return filter.selectedValues.includes(
+                            brigade.departmentId
+                        );
+                    case "connectionState":
+                        return filter.selectedValues.includes(
+                            brigade.connectionStateId
+                        );
+                    default:
+                        return true; // Если фильтр неизвестен, не фильтруем по нему
+                }
+            });
+        });
+
         setFilteredBrigades(newFilteredBrigades);
     };
 
@@ -84,16 +96,12 @@ const BrigadesList: React.FC = () => {
         { key, index, isScrolling, isVisible, style }: ListRowProps,
         listWidth: number
     ): JSX.Element => {
-        console.log("index: ", index);
-        console.log("style: ", style);
-
         const cardsPerRow = Math.floor(listWidth / cardWidth) || 1;
         const brigadesForRow = filteredBrigades?.slice(
             index * cardsPerRow,
             (index + 1) * cardsPerRow
         );
 
-        console.log("cardsPerRow: ", cardsPerRow);
         return (
             <div
                 key={key}
@@ -109,8 +117,16 @@ const BrigadesList: React.FC = () => {
                     <div key={`${key}_${idx}`} style={{ flex: "1" }}>
                         <BrigadeCard
                             brigadeName={brigade.name}
-                            departmentName={brigade.department.name}
-                            connectionState={brigade.connectionState.name}
+                            department={
+                                departments?.find(
+                                    (d) => d.id == brigade.departmentId
+                                ) ?? null
+                            }
+                            connectionState={
+                                connectionStates?.find(
+                                    (d) => d.id == brigade.connectionStateId
+                                ) ?? null
+                            }
                             cluster={brigade.position.cluster}
                             field={brigade.position.field}
                             well={brigade.position.well}
@@ -121,33 +137,71 @@ const BrigadesList: React.FC = () => {
         );
     };
 
+    // const noRowsRenderer = () => {
+    //     return (
+    //         <div style={{ textAlign: "center", marginTop: 20 }}>
+    //             <h3>Нет данных для отображения</h3>
+    //             <Paragraph style={{ fontSize: "14px" }}>
+    //                 Пожалуйста, измените критерии фильтрации или перезагрузите
+    //                 страницу.
+    //             </Paragraph>
+    //         </div>
+    //     );
+    // };
+
+    if (isLoading) {
+        return (
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    height: "80%",
+                }}
+            >
+                <Spin style={{ marginBottom: "10px" }} size="large" />
+                <Paragraph style={{ color: "#1699ff", fontSize: "16px" }}>
+                    Загрузка...
+                </Paragraph>
+            </div>
+        );
+    }
+
+    console.log("filteredBrigades: ", filteredBrigades);
     return (
         <>
-            <BrigadesFilters
-                connectionStates={connectionStates}
-                departments={departments}
-                onSelectedDepartmentChange={(selectedValues) => {
-                    onSelectedDepartmentChange(selectedValues);
-                }}
-                onSelectedConnectionChange={(selectedValues) => {
-                    onSelectedConnectionChange(selectedValues);
-                }}
-            />
+            <div style={{ marginLeft: "20px" }}>
+                <BrigadesFilters
+                    //TODO поправить
+                    connectionStates={connectionStates ? connectionStates : []}
+                    departments={departments ? departments : []}
+                    onFiltersChange={handleFiltersChange}
+                />
+            </div>
             <AutoSizer>
                 {({ width, height }: Size) => (
-                    <List
-                        style={{ padding: "20px" }}
-                        width={width}
-                        height={height - 80}
-                        rowCount={Math.ceil(
-                            filteredBrigades?.length || 0 / Math.max(1, Math.floor(width / cardWidth))
-                        )}
-                        rowHeight={270 + 20}
-                        rowRenderer={(listProps) =>
-                            rowRenderer(listProps, width)
-                        }
-                        overscanRowCount={3}
-                    />
+                    <div style={{ width: width, height: height }}>
+                        <List
+                            style={{ padding: "0px 20px 20px 20px" }}
+                            width={width - 20}
+                            height={height}
+                            rowCount={Math.ceil(
+                                filteredBrigades?.length ||
+                                    0 /
+                                        Math.max(
+                                            1,
+                                            Math.floor(width / cardWidth)
+                                        )
+                            )}
+                            rowHeight={270 + 20}
+                            rowRenderer={(listProps) =>
+                                rowRenderer(listProps, width)
+                            }
+                            overscanRowCount={3}
+                            // noRowsRenderer={noRowsRenderer}
+                        />
+                    </div>
                 )}
             </AutoSizer>
         </>

@@ -27,7 +27,7 @@ const SelectFilter: React.FC<SelectFilterProps> = ({
             size="large"
             placeholder={placeholder}
             allowClear
-            onChange={onChangeSelectedValue}
+            onChange={(selectedValues) => onChangeSelectedValue( typeof(selectedValues) == "number" ? [selectedValues] : selectedValues)}
         >
             {items.map((item) => (
                 <Select.Option key={item.id} value={item.id}>

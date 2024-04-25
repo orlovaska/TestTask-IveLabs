@@ -1,59 +1,15 @@
-// import React from "react";
-// import { Card } from "antd";
-
-// interface BrigadeData {
-//     brigadeName: string;
-//     departmentName: string;
-//     connectionState: string;
-//     cluster: number;
-//     field: string;
-//     well: number;
-// }
-
-// const BrigadeCard: React.FC<BrigadeData> = ({
-//     brigadeName,
-//     departmentName,
-//     connectionState,
-//     cluster,
-//     field,
-//     well,
-// }) => {
-//     return (
-//         <Card
-//             style={{
-//                 width: "100%",
-//                 minWidth: "200px",
-//                 height: "260px"
-//             }}
-//         >
-//             <Card.Meta
-//                 title={brigadeName}
-//                 description={
-//                     <>
-//                         <p>{departmentName}</p>
-//                         <p>{`Соединение: ${connectionState}`}</p>
-//                         <p>{`Кластер: ${cluster}`}</p>
-//                         <p>{`Поле: ${field}`}</p>
-//                         <p>{`Скважина: ${well}`}</p>
-//                     </>
-//                 }
-//             />
-//         </Card>
-//     );
-// };
-
-// export default BrigadeCard;
-
 import React from "react";
 import { Card, Typography } from "antd";
 import { CheckCircleOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { ConnectionState } from "../../models/ConnectionState";
+import { Department } from "../../models/Department";
 
 const { Title, Paragraph } = Typography;
 
 interface BrigadeData {
     brigadeName: string;
-    departmentName: string;
-    connectionState: string;
+    department: Department | null;
+    connectionState: ConnectionState | null;
     cluster: number;
     field: string;
     well: number;
@@ -61,14 +17,14 @@ interface BrigadeData {
 
 const BrigadeCard: React.FC<BrigadeData> = ({
     brigadeName,
-    departmentName,
+    department,
     connectionState,
     cluster,
     field,
     well,
 }) => {
     const connectionStatusIcon =
-        connectionState === "В норме" ? (
+        connectionState?.id === 1 ? (
             <CheckCircleOutlined style={{ color: "green" }} />
         ) : (
             <CloseCircleOutlined style={{ color: "red" }} />
@@ -83,16 +39,16 @@ const BrigadeCard: React.FC<BrigadeData> = ({
                     height: "270px",
                     borderRadius: "8px",
                     overflow: "hidden",
-                    transition: "box-shadow 0.3s",
+                    transition: "box-shadow 0.2s",
                 }}
                 hoverable
             >
                 <Title level={4} style={{ marginTop: 0 }}>
                     {brigadeName}
                 </Title>
-                <Paragraph>{departmentName}</Paragraph>
+                <Paragraph>{department?.name}</Paragraph>
                 <Paragraph>
-                    Соединение: {connectionStatusIcon} {connectionState}
+                    Соединение: {connectionStatusIcon} {connectionState?.name}
                 </Paragraph>
                 <Paragraph>Кластер: {cluster}</Paragraph>
                 <Paragraph>Поле: {field}</Paragraph>

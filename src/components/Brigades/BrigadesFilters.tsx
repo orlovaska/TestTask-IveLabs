@@ -1,22 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { Flex } from "antd";
 import { ConnectionState } from "../../models/ConnectionState";
 import { Department } from "../../models/Department";
 import SelectFilter from "./Filters/SelectFilter";
 
+export interface Filter {
+    filteringFields: "department" | "connectionState";
+    selectedValues: number[] | undefined;
+}
+
 interface BrigadesFiltersProps {
     connectionStates: ConnectionState[];
     departments: Department[];
-    onSelectedDepartmentChange: (selectedValues: number[] | undefined) => void;
-    onSelectedConnectionChange: (selectedValues: number[] | undefined) => void;
+    onFiltersChange: (filters: Filter[]) => void;
 }
 
 const BrigadesFilters: React.FC<BrigadesFiltersProps> = ({
     connectionStates,
     departments,
-    onSelectedDepartmentChange,
-    onSelectedConnectionChange,
+    onFiltersChange,
 }) => {
+    const [filters, setFilters] = useState<Filter[]>([
+        { filteringFields: "department", selectedValues: undefined },
+        { filteringFields: "connectionState", selectedValues: undefined },
+    ]);
+    const onSelectedValuesChange = (
+        newSelectedValues: number[] | undefined,
+        filteringFields: "department" | "connectionState"
+    ) => {
+        const newFilters = [...filters].map((filter) => {
+            if (filter.filteringFields == filteringFields) {
+                filter.selectedValues = newSelectedValues;
+            }
+            return filter;
+        });
+        setFilters(newFilters);
+        onFiltersChange(newFilters);
+    };
+
     return (
         <Flex
             gap="middle"
@@ -35,13 +56,17 @@ const BrigadesFilters: React.FC<BrigadesFiltersProps> = ({
                 }))}
                 placeholder="Соединение"
                 multiSelect={false}
-                onChangeSelectedValue={onSelectedConnectionChange}
+                onChangeSelectedValue={(selectedValues) =>
+                    onSelectedValuesChange(selectedValues, "connectionState")
+                }
             />
             <SelectFilter
                 items={departments}
                 placeholder="Департамент"
                 multiSelect={true}
-                onChangeSelectedValue={onSelectedDepartmentChange}
+                onChangeSelectedValue={(selectedValues) =>
+                    onSelectedValuesChange(selectedValues, "department")
+                }
             />
         </Flex>
     );
