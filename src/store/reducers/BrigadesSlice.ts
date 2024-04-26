@@ -4,7 +4,7 @@ import { Department } from "../../models/Department";
 import { ConnectionState, transformConnectionStateArray } from "../../models/ConnectionState";
 import BrigadeService from "../../services/BrigadeService";
 
-interface UserState {
+interface BrigadesState {
     brigades: Brigade[] | null;
     departments: Department[] | null;
     connectionStates: ConnectionState[] | null;
@@ -12,7 +12,7 @@ interface UserState {
     error: string | null;
 }
 
-const initialState: UserState = {
+const initialState: BrigadesState = {
     brigades: null,
     departments: null,
     connectionStates: null,

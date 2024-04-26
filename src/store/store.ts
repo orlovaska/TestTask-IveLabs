@@ -1,9 +1,11 @@
 import {combineReducers, configureStore } from "@reduxjs/toolkit"
 import brigadesReducer from "./reducers/BrigadesSlice"
+import pointsReducer from "./reducers/PointsSlice"
 
 
 const rootReducer = combineReducers({
-    brigadesReducer
+    brigadesReducer,
+    pointsReducer
 })
 
 export const setupStore = () => {

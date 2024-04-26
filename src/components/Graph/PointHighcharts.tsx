@@ -1,15 +1,33 @@
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import GetPointsButton from "./GetPointsButton";
-import React from "react";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { Modal, Spin, Typography } from "antd";
+import { fetchPoints } from "../../store/reducers/PointsSlice";
+const { Paragraph } = Typography;
 
 const PointHighChart: React.FC = () => {
+    const { points, isLoading, error } = useAppSelector(
+        (state) => state.pointsReducer
+    );
+    const data = points?.map((point) => [Date.parse(point.x), point.y]);
+
+    useEffect(() => {
+        if (error) {
+            Modal.error({
+                title: "Ошибка при получении данных",
+                content: error,
+            });
+        }
+    }, [error]);
+
     const options: Highcharts.Options = {
         chart: {
             type: "line",
         },
         title: {
-            text: "График с данными",
+            text: "График",
         },
         xAxis: {
             type: "datetime",
@@ -27,11 +45,7 @@ const PointHighChart: React.FC = () => {
                 step: "left",
                 type: "line",
                 name: "Серия данных",
-                data: [
-                    [Date.parse("2023-01-01 00:00:00"), 440],
-                    [Date.parse("2023-01-01 12:30:00"), 460],
-                    [Date.parse("2023-01-01 15:45:00"), 480],
-                ],
+                data: data,
             },
         ],
     };
@@ -41,7 +55,24 @@ const PointHighChart: React.FC = () => {
             <div style={{ marginLeft: "20px" }}>
                 <GetPointsButton defaultValue={1000} />
             </div>
-            <HighchartsReact highcharts={Highcharts} options={options} />
+            {isLoading ? (
+                <div
+                    style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        height: "100%"
+                    }}
+                >
+                    <Spin style={{ marginBottom: "10px" }} size="large" />
+                    <Paragraph style={{ color: "#1699ff", fontSize: "16px" }}>
+                        Загрузка...
+                    </Paragraph>
+                </div>
+            ) : (
+                <HighchartsReact highcharts={Highcharts} options={options} />
+            )}
         </div>
     );
 };

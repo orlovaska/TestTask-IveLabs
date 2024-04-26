@@ -1,16 +1,25 @@
 import { InputNumber, Button } from "antd";
 import { useState } from "react";
+import { useAppDispatch } from "../../hooks/redux";
+import { fetchPoints } from "../../store/reducers/PointsSlice";
 
 interface GetPointsButtonProps {
     defaultValue: number;
 }
 
 const GetPointsButton: React.FC<GetPointsButtonProps> = (props) => {
+    const dispatch = useAppDispatch();
     const [inputValue, setInputValue] = useState<number | null>(
         props.defaultValue
     );
 
-    const downloadPoints = () => {};
+    const downloadPoints = () => {
+        console.log("inputValue: ", inputValue);
+        
+        if (inputValue) {
+            dispatch(fetchPoints(inputValue));
+        }
+    };
 
     return (
         <div
