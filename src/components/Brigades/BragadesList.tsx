@@ -172,8 +172,8 @@ const BrigadesList: React.FC = () => {
                         width={width}
                         height={height - 125}
                         rowCount={Math.ceil(
-                            filteredBrigades?.length ||
-                                0 / Math.max(1, Math.floor(width / cardWidth))
+                            (filteredBrigades?.length ||
+                                0) / Math.max(1, Math.floor(width / cardWidth))
                         )}
                         rowHeight={270 + 20}
                         rowRenderer={(listProps) =>
