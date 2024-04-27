@@ -11,6 +11,7 @@ interface SelectFilterProps {
     items: ItemWithId[];
     placeholder: string;
     onChangeSelectedValue: (value: number[] | undefined) => void;
+    /** Мульти выбор. По-умолчанию true */
     multiSelect: boolean;
 }
 

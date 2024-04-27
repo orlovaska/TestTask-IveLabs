@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { AutoSizer, List, ListRowProps } from "react-virtualized";
-import "react-virtualized/styles.css"; // импортируем стили
+import "react-virtualized/styles.css";
 import BrigadeCard from "./BrigadeCard";
 import BrigadesFilters, { Filter } from "./BrigadesFilters";
 import { Brigade } from "../../models/Brigade";
@@ -137,18 +137,6 @@ const BrigadesList: React.FC = () => {
         );
     };
 
-    // const noRowsRenderer = () => {
-    //     return (
-    //         <div style={{ textAlign: "center", marginTop: 20 }}>
-    //             <h3>Нет данных для отображения</h3>
-    //             <Paragraph style={{ fontSize: "14px" }}>
-    //                 Пожалуйста, измените критерии фильтрации или перезагрузите
-    //                 страницу.
-    //             </Paragraph>
-    //         </div>
-    //     );
-    // };
-
     if (isLoading) {
         return (
             <div
@@ -168,12 +156,10 @@ const BrigadesList: React.FC = () => {
         );
     }
 
-    console.log("filteredBrigades: ", filteredBrigades);
     return (
         <>
-            <div style={{ marginLeft: "20px" }}>
+            <div style={{ marginLeft: "20px", position: "relative" }}>
                 <BrigadesFilters
-                    //TODO поправить
                     connectionStates={connectionStates ? connectionStates : []}
                     departments={departments ? departments : []}
                     onFiltersChange={handleFiltersChange}
@@ -181,27 +167,20 @@ const BrigadesList: React.FC = () => {
             </div>
             <AutoSizer>
                 {({ width, height }: Size) => (
-                    <div style={{ width: width, height: height }}>
-                        <List
-                            style={{ padding: "0px 20px 20px 20px" }}
-                            width={width - 20}
-                            height={height}
-                            rowCount={Math.ceil(
-                                filteredBrigades?.length ||
-                                    0 /
-                                        Math.max(
-                                            1,
-                                            Math.floor(width / cardWidth)
-                                        )
-                            )}
-                            rowHeight={270 + 20}
-                            rowRenderer={(listProps) =>
-                                rowRenderer(listProps, width)
-                            }
-                            overscanRowCount={3}
-                            // noRowsRenderer={noRowsRenderer}
-                        />
-                    </div>
+                    <List
+                        style={{ padding: "0px 20px 20px 20px" }}
+                        width={width}
+                        height={height - 125}
+                        rowCount={Math.ceil(
+                            filteredBrigades?.length ||
+                                0 / Math.max(1, Math.floor(width / cardWidth))
+                        )}
+                        rowHeight={270 + 20}
+                        rowRenderer={(listProps) =>
+                            rowRenderer(listProps, width)
+                        }
+                        overscanRowCount={3}
+                    />
                 )}
             </AutoSizer>
         </>

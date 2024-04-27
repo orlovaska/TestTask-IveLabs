@@ -3,7 +3,9 @@ export interface ConnectionState {
     name: string;
 }
 
-// Функция для преобразования данных бекенда в интерфейс ConnectionState
+/**
+ * Преобразует данные изи API в interface ConnectionState
+ */
 export const transformConnectionStateArray = (backendData: Array<{ connectionStateId: number; name: string }>): ConnectionState[] => {
     return backendData.map(data => ({
       id: data.connectionStateId,

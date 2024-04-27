@@ -2,9 +2,8 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import GetPointsButton from "./GetPointsButton";
 import React, { useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../hooks/redux";
+import { useAppSelector } from "../../hooks/redux";
 import { Modal, Spin, Typography } from "antd";
-import { fetchPoints } from "../../store/reducers/PointsSlice";
 const { Paragraph } = Typography;
 
 const PointHighChart: React.FC = () => {

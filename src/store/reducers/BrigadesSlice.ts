@@ -1,7 +1,10 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Brigade, transformBrigadeArray } from "../../models/Brigade";
 import { Department } from "../../models/Department";
-import { ConnectionState, transformConnectionStateArray } from "../../models/ConnectionState";
+import {
+    ConnectionState,
+    transformConnectionStateArray,
+} from "../../models/ConnectionState";
 import BrigadeService from "../../services/BrigadeService";
 
 interface BrigadesState {

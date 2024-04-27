@@ -6,6 +6,9 @@ import {
     getDepartments_ROUTE,
 } from "./APIconsts";
 
+/**
+ * Класс для взаимодействия с API по данным бригад
+ */
 export default class BrigadeService {
     static async getBrigadesData(): Promise<AxiosResponse<any>> {
         const result = axios.get<any>(`${API_URL}/${getBrigadesData_ROUTE}`);

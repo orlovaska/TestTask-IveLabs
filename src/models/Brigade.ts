@@ -1,13 +1,8 @@
-import { ConnectionState } from "./ConnectionState";
-import { Department } from "./Department";
-
 export interface Brigade {
     id: number;
     name: string;
     connectionStateId: number;
     departmentId: number;
-    // connectionState: ConnectionState
-    // department: Department
     position: Position;
 }
 
@@ -17,6 +12,9 @@ export interface Position {
     well: number;
 }
 
+/**
+ * Преобразует данные изи API в interface Brigade
+ */
 export function transformBrigadeArray(backendData: Array<any>): Brigade[] {
     return backendData.map((input) => ({
         id: input.id,

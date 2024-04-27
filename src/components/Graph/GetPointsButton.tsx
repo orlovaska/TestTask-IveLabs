@@ -14,8 +14,6 @@ const GetPointsButton: React.FC<GetPointsButtonProps> = (props) => {
     );
 
     const downloadPoints = () => {
-        console.log("inputValue: ", inputValue);
-        
         if (inputValue) {
             dispatch(fetchPoints(inputValue));
         }

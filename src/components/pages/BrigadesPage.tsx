@@ -12,7 +12,7 @@ const BrigadesPage: React.FC = () => {
             }}
         >
             <Navbar activeKey={BRIGADES_ROUTE} />
-            <BrigadesList/>
+            <BrigadesList />
         </div>
     );
 };

@@ -1,5 +1,4 @@
 import { PayloadAction, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Department } from "../../models/Department";
 import PointService from "../../services/PointService";
 import { Point } from "../../models/Point";
 
@@ -16,7 +15,7 @@ const initialState: PointsState = {
 };
 
 export const pointsSlice = createSlice({
-    name: "brigades",
+    name: "points",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -43,10 +42,9 @@ export const pointsSlice = createSlice({
 });
 
 export const fetchPoints = createAsyncThunk(
-    "brigades/fetchPoints",
+    "points/fetchPoints",
     async (countOfPoints: number, thunkAPI) => {
         try {
-            //TODO
             const response = await PointService.getPointsFast(countOfPoints);
             return response.data;
         } catch (error) {
